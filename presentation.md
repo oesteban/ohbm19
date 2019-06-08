@@ -1,7 +1,7 @@
 class: center middle
 
 # fMRIPrep - A Robust Preprocessing Pipeline for Functional MRI
-### O. Esteban, R. Ciric, CJ. Markiewicz, RA. Poldrack, and KJ. Gorgolewski
+### CJ. Markiewicz, R. Ciric, O. Esteban
 #### Center for Reproducible Neuroscience
 #### Stanford University
 
@@ -28,7 +28,7 @@ layout: true
 
 * By adhering to modern data format standards, fMRIPrep can detect
   the available images and prepare outputs that can be used by all
-  major software packages (FSL, SPM, etc.)
+  major software packages (FSL, SPM\*, etc.)
 
 ## Self-documenting
 
@@ -37,6 +37,7 @@ layout: true
 
 ]
 
+.footnote[\* Output NIfTI files are compressed, which can be pretty inconvenient for SPM users.]
 ---
 
 ## Index
@@ -186,7 +187,7 @@ Variance explained w.r.t. number of components, with (a/t)CompCor denoising.
 </p>
 
 The BOLD summary report shows several characteristic statistics along
-with a carpetplot, giving a view of the temporal characteristics of the
+with a carpetplot ([Power, 2016](https://doi.org/10.1016/j.neuroimage.2016.08.009)), giving a view of the temporal characteristics of the
 preprocessed BOLD series.
 
 ---
@@ -227,171 +228,6 @@ presented since fMRIPrep 1.4.0.
 
 
 * Figure from ([Glasser et al., 2013](https://doi.org/10.1016/j.neuroimage.2013.04.127))
-]
-
----
-
-# MRIQC vs. fMRIPrep
-
-.pull-left[
-
-### MRIQC
-
-* Purpose: assessment of *raw* MRI data
-* Processing: quick & dirty
-* Derivatives: image quality metrics only
-* Reports: to assess the data
-* Other outcomes: data exclusion list
-
-#### Use first with pre-specified exclusion criteria
-]
-
---
-
-.pull-right[
-### fMRIPrep
-
-* Purpose: ready data for analysis
-* Processing: careful & sophisticated
-* Derivatives: BOLD data to feed models and contound regressors
-* Reports: to assess the processing
-* Other outcomes: boilerplate, etc.
-
-#### Use after MRIQC, only on those subjects who passed QC
-]
-
----
-
-.left-column[
-# fMRIPrep
-### What is it?
-### How do I use it?
-]
-.right-column[
-## Brain Imaging Data Structure
-* fMRIPrep will run on any BIDS-formatted dataset ([What is BIDS?](https://bids.neuroimaging.io))
-
-
-### Docker
-```Bash
-$ pip install fmriprep-docker
-$ fmriprep-docker /data_dir /outputs_dir participant
-```
-
-### Singularity
-```Bash
-$ singularity exec docker://poldracklab/fmriprep:latest \
-  /data_dir /outputs_dir participant
-```
-
-### [OpenNeuro.org](https://openneuro.org/)
-
-* OpenNeuro is a free, online platform for sharing and analyzing neuroimaging data
-]
-
-
----
-
-.small[
-```Bash
-#!/bin/bash
-#
-#SBATCH -J fmriprep
-#SBATCH --array=1-13
-#SBATCH --time=48:00:00
-#SBATCH -n 1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem-per-cpu=4G
-#SBATCH -p russpold,owners,normal
-
-# Outputs ----------------------------------
-#SBATCH -o log/%x-%A-%a.out
-#SBATCH -e log/%x-%A-%a.err
-#SBATCH --mail-user=%u@stanford.edu
-#SBATCH --mail-type=ALL
-# ------------------------------------------
-
-BIDS_DIR="$OAK/data/openfmri/ds000003"
-
-export TEMPLATEFLOW_HOME="/oak/stanford/groups/russpold/data/templateflow"
-SINGULARITY_CMD="singularity run -B $OAK:$OAK -B $L_SCRATCH:/work $GROUP_HOME/singularity_images/
-poldracklab_fmriprep_1.4.0-2019-05-15-2870a0e4efbf.simg"
-OUTPUT_DIR="${OAK}/data/openfmri/derivatives/ds000003/fmriprep-1.4.0"
-
-unset PYTHONPATH
-export FS_LICENSE=$HOME/.freesurfer.txt
-
-subject=$( tail -n +2 $BIDS_DIR/participants.tsv | cut -f 1  | sed "${SLURM_ARRAY_TASK_ID}q;d" | sed "s/sub-//g" | \
-           sed 's!.*/!!' )
-cmd="${SINGULARITY_CMD} ${BIDS_DIR} ${OUTPUT_DIR} participant --participant-label $subject -w /work/ --use-aroma -vv \
-    --skip_bids_validation --omp-nthreads 8 --nthreads 12 --mem_mb 30000 --use-syn-sdc --cifti-output --notrack \
-    --output-spaces MNI152NLin2009cAsym:res-2 anat fsnative fsaverage5"
-echo Running task ${SLURM_ARRAY_TASK_ID}
-echo Commandline: $cmd
-eval $cmd
-exitcode=$?
-
-if [ "$exitcode" -ne "0" ]; then
-    echo "$subject" >> ${SLURM_JOB_NAME}_failed_subjects.${SLURM_ARRAY_JOB_ID}
-    echo "${SLURM_ARRAY_TASK_ID}" >> ${SLURM_JOB_NAME}_failed_taskids.${SLURM_ARRAY_JOB_ID}
-else
-    echo "$subject" >> ${SLURM_JOB_NAME}_success_subjects.${SLURM_ARRAY_JOB_ID}
-fi
-
-echo Finished tasks ${SLURM_ARRAY_TASK_ID} with exit code $exitcode
-exit $exitcode
-```
-]
-
-
----
-
-
-### Requesting resources
-
-```Bash
-#!/bin/bash
-#
-#SBATCH -J fmriprep
-#SBATCH --array=1-13%4
-#SBATCH --time=48:00:00
-#SBATCH -n 1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem-per-cpu=4G
-#SBATCH -p russpold,owners,normal
-
-# Outputs ----------------------------------
-#SBATCH -o log/%x-%A-%a.out
-#SBATCH -e log/%x-%A-%a.err
-#SBATCH --mail-user=%u@stanford.edu
-#SBATCH --mail-type=ALL
-# ------------------------------------------
-```
-
-Key line:
-
-```Bash
-#SBATCH --array=1-13%4
-```
-
-This will generate 13 parallel jobs, running maximum 4 simultaneously at any given time.
-SLURM will generate variables ``${SLURM_ARRAY_TASK_ID}`` with integer values from 1 to 13
-available in the scope of the sbatch script.
-
-
-
----
-
-### Your data
-
-.pull-left[![Example BIDS Dataset](assets/bids.png)]
-.pull-right[
-* BIDS datasets are organized by subject, modality, and image type.
-
-* fMRIPrep uses T1-weighted images for anatomical preprocessing.
-
-* BOLD series and field maps (if available) are used for
-functional preprocessing.
 ]
 
 ---
@@ -440,11 +276,42 @@ In each output space (e.g., T1w, MNI, surface\*):
 
 ---
 
+# MRIQC vs. fMRIPrep
+
+.pull-left[
+
+### MRIQC
+
+* Purpose: assessment of *raw* MRI data
+* Processing: quick & dirty
+* Derivatives: image quality metrics only
+* Reports: to assess the data
+* Other outcomes: data exclusion list
+
+#### Use first with pre-specified exclusion criteria
+]
+
+--
+
+.pull-right[
+### fMRIPrep
+
+* Purpose: ready data for analysis
+* Processing: careful & sophisticated
+* Derivatives: BOLD data to feed models and contound regressors
+* Reports: to assess the processing
+* Other outcomes: boilerplate, etc.
+
+#### Use after MRIQC, only on those subjects who passed QC
+]
+
+
+---
+
 layout: true
 template: footer
 
-## fMRIPrep walkthrough
-### Reports
+## fMRIPrep Reports
 
 ---
 
@@ -495,6 +362,508 @@ template: funcsum
 1. Show researchers their data
 2. Describe the preprocessing performed
 3. Show the results of preprocessing, facilitating early error detection
+
+---
+layout: true
+template: footer
+---
+
+# Hands on a report
+
+[You can link the new Sherlock Web Browser!](https://login.sherlock.stanford.edu/pun/sys/files/fs/oak/stanford/groups/russpold/data/openfmri/derivatives/ds000003/fmriprep-1.4.0/fmriprep/)
+
+---
+
+.left-column[
+# fMRIPrep
+### What is it?
+### How do I use it?
+]
+.right-column[
+## Brain Imaging Data Structure
+* fMRIPrep will run on any BIDS-formatted dataset ([What is BIDS?](https://bids.neuroimaging.io))
+
+
+### Docker
+```Bash
+$ pip install fmriprep-docker
+$ fmriprep-docker /data_dir /outputs_dir participant
+```
+
+### Singularity
+```Bash
+$ singularity run docker://poldracklab/fmriprep:1.4.0 \
+  /data_dir /outputs_dir participant
+```
+
+### [OpenNeuro.org](https://openneuro.org/)
+
+* OpenNeuro is a free, online platform for sharing and analyzing neuroimaging data
+]
+---
+
+
+# Running fMRIPrep on Sherlock
+
+* Upload a BIDS-valid dataset (check with [the validator](https://bids-standard.github.io/bids-validator/)).
+
+--
+
+* Decide on a directory tree structure. Recommendation from BIDS-Derivatives:
+  .small[
+  ```Bash
+├── CHANGES
+├── dataset_description.json
+├── derivatives
+│   ├── fmriprep-1.0.8
+│   ├── fmriprep-1.2.5
+│   ├── freesurfer-6.0.1
+│   ├── fslfeat-5.0.11
+│   └── mriqc-0.15.0
+├── README
+├── sub-10159
+│   ├── anat
+│   ├── beh
+│   ├── dwi
+│   └── func
+├── sub-10171
+...
+├── task-bart_bold.json
+├── task-bht_bold.json
+├── task-pamenc_bold.json
+├── task-pamret_bold.json
+├── task-rest_bold.json
+├── task-scap_bold.json
+├── task-stopsignal_bold.json
+└── task-taskswitch_bold.json
+
+  1366 directories, 116 files
+  ```
+  ]
+
+--
+
+* Ensure pre-run FreeSurfer outputs are accessible by fMRIPrep
+
+---
+
+### Sherlock - execution strategy
+
+* Run one subject per node (16 cores, 64GB RAM),
+  
+  * let SLURM parallelize via *job-array*.
+
+--
+
+* Write intermediate results to `$LOCAL_SCRATCH`.
+
+--
+
+* Write outputs to the designated `derivatives/` folder,
+
+  * can be *cold* storage.
+
+--
+
+* Consider [DataLad](https://www.datalad.org/) for inputs/outputs.
+
+--
+
+* Decide on a working directory for SLURM:
+
+  * it can be your *home* directory or some *scratch* space (user or group),
+  * check permissions and shareability with stakeholders of the project.
+
+--
+
+* Create some necessary folders and the "sbatch" file:
+
+  ```Bash
+  $ mkdir -p $HOME/slurm/ds000003/log
+  $ vim $HOME/slurm/ds000003/fmriprep.sbatch
+  ```
+
+---
+
+.small[
+```Bash
+#!/bin/bash
+#
+#SBATCH -J fmriprep
+#SBATCH --array=1-13%4
+#SBATCH --time=48:00:00
+#SBATCH -n 1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem-per-cpu=4G
+#SBATCH -p russpold,owners,normal
+
+# Outputs ----------------------------------
+#SBATCH -o log/%x-%A-%a.out
+#SBATCH -e log/%x-%A-%a.err
+#SBATCH --mail-user=%u@stanford.edu
+#SBATCH --mail-type=ALL
+# ------------------------------------------
+
+BIDS_DIR="$OAK/data/ds000003"
+OUTPUT_DIR="${BIDS_DIR}/derivatives/fmriprep-1.4.0"
+
+export SINGULARITYENV_TEMPLATEFLOW_HOME="$OAK/data/templateflow"
+SINGULARITY_CMD="singularity run -B $OAK:$OAK -B $L_SCRATCH:/work $GROUP_HOME/singularity_images/ \
+                 --cleanenv poldracklab_fmriprep_1.4.0-2019-05-15-2870a0e4efbf.simg"
+
+unset PYTHONPATH
+export FS_LICENSE=$HOME/.freesurfer.txt
+
+subject=$( tail -n +2 $BIDS_DIR/participants.tsv | cut -f 1  | sed "${SLURM_ARRAY_TASK_ID}q;d" | sed "s/sub-//g" | \
+           sed 's!.*/!!' )
+cmd="${SINGULARITY_CMD} ${BIDS_DIR} ${OUTPUT_DIR} participant --participant-label $subject -w /work/ -vv \
+    --omp-nthreads 8 --nthreads 12 --mem_mb 30000 --use-syn-sdc --cifti-output --use-aroma \
+    --output-spaces MNI152NLin2009cAsym:res-2 anat fsnative fsaverage5"
+echo Running task ${SLURM_ARRAY_TASK_ID}
+echo Commandline: $cmd
+eval $cmd
+exitcode=$?
+
+if [ "$exitcode" -ne "0" ]; then
+    echo "$subject" >> ${SLURM_JOB_NAME}_failed_subjects.${SLURM_ARRAY_JOB_ID}
+    echo "${SLURM_ARRAY_TASK_ID}" >> ${SLURM_JOB_NAME}_failed_taskids.${SLURM_ARRAY_JOB_ID}
+else
+    echo "$subject" >> ${SLURM_JOB_NAME}_success_subjects.${SLURM_ARRAY_JOB_ID}
+fi
+
+echo Finished tasks ${SLURM_ARRAY_TASK_ID} with exit code $exitcode
+exit $exitcode
+```
+]
+
+---
+
+
+### Sherlock - Requesting resources
+
+```Bash
+#!/bin/bash
+#
+#SBATCH -J fmriprep
+#SBATCH --array=1-13%4
+#SBATCH --time=48:00:00
+#SBATCH -n 1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem-per-cpu=4G
+#SBATCH -p russpold,owners,normal
+
+# Outputs ----------------------------------
+#SBATCH -o log/%x-%A-%a.out
+#SBATCH -e log/%x-%A-%a.err
+#SBATCH --mail-user=%u@stanford.edu
+#SBATCH --mail-type=ALL
+# ------------------------------------------
+```
+
+Key line:
+
+```Bash
+#SBATCH --array=1-13%4
+```
+
+This will generate 13 parallel jobs, running maximum 4 simultaneously at any given time.
+SLURM will generate variables `${SLURM_ARRAY_TASK_ID}` with integer values from 1 to 13
+available in the scope of the sbatch script.
+
+---
+
+layout: true
+template: footer
+
+---
+
+### Sherlock - setting up
+
+.small[
+```Bash
+BIDS_DIR="$OAK/data/ds000003"
+OUTPUT_DIR="${BIDS_DIR}/derivatives/fmriprep-1.4.0"
+
+export SINGULARITYENV_TEMPLATEFLOW_HOME="$OAK/data/templateflow"
+SINGULARITY_CMD="singularity run -B $OAK:$OAK -B $L_SCRATCH:/work $GROUP_HOME/singularity_images/ \
+                 --cleanenv poldracklab_fmriprep_1.4.0-2019-05-15-2870a0e4efbf.simg"
+
+unset PYTHONPATH
+export FS_LICENSE=$HOME/.freesurfer.txt
+```
+]
+
+  * Set `TEMPLATEFLOW_HOME` or bind a writable directory to `/opt/templateflow` including:
+    ```Bash
+    singularity run -B $HOME/.cache/templateflow:/opt/templateflow
+    ```
+
+--
+
+  * Although `$OAK` and `$L_SCRATCH` are generally bound by default, I recommend binding them explicitly.
+
+--
+
+  * At the Poldrack Lab, we store our singularity images under `$GROUP_HOME/singularity_images/`
+
+--
+  
+  * Provide a valid FreeSurfer license (e.g., `$HOME/.freesurfer.txt`).
+    If the folder is not bound by default, bind it explicitly.
+
+--
+
+  * `--cleanenv` ensures your environment does not leak into container.
+
+---
+
+### Sherlock - two golden lines
+
+* Filter subject labels out of the `/participants.tsv` file, selecting
+  entry `$SLURM_ARRAY_TASK_ID` for this particular job:
+  .small[
+  ```Bash
+subject=$( tail -n +2 $BIDS_DIR/participants.tsv | cut -f 1  | sed "${SLURM_ARRAY_TASK_ID}q;d" | \
+               sed "s/sub-//g" | sed 's!.*/!!' )
+
+  ```
+  ]
+
+* Once we have selected the participant to be run by this job-array task,
+  we compose the full command line:
+  ```Bash
+  cmd="${SINGULARITY_CMD} ${BIDS_DIR} ${OUTPUT_DIR} participant \
+       --participant-label $subject -w /work/ -vv \
+       --omp-nthreads 8 --nthreads 12 --mem_mb 30000 \
+       --use-syn-sdc --cifti-output --use-aroma \
+       --output-spaces MNI152NLin2009cAsym:res-2 anat fsnative fsaverage5"
+  ```
+
+---
+
+### Sherlock - two golden lines (break down)
+
+* Mandatory elements of [BIDS-Apps](https://doi.org/10.1371/journal.pcbi.1005209):
+  .small[
+  ```Bash
+cmd="${SINGULARITY_CMD} ${BIDS_DIR} ${OUTPUT_DIR} participant \
+  ```
+  ]
+
+* Select subject `$subject` and write intermediate results to `$L_SCRATCH`,
+  and be verbose (`-vvv` for VERY verbose):
+  .small[
+  ```Bash
+      --participant-label $subject -w /work/ -vv \
+  ```
+  ]
+
+* Some resource management:
+  .small[
+  ```Bash
+      --omp-nthreads 8 --nthreads 12 --mem_mb 30000 \
+  ```
+  ]
+
+* Workflow configuration:
+  .small[
+  ```Bash
+      --use-syn-sdc --cifti-output --use-aroma \
+  ```
+  ]
+
+* Define output spaces, close string:
+  .small[
+  ```Bash
+      --output-spaces 'MNI152NLin2009cAsym:res-2' 'anat' 'fsnative' 'fsaverage5'"
+  ```
+  ]
+
+---
+
+### Sherlock - Do it!
+
+.small[
+```Bash
+echo Running task ${SLURM_ARRAY_TASK_ID}
+echo Commandline: $cmd
+eval $cmd
+exitcode=$?
+
+if [ "$exitcode" -ne "0" ]; then
+    echo "$subject" >> ${SLURM_JOB_NAME}_failed_subjects.${SLURM_ARRAY_JOB_ID}
+    echo "${SLURM_ARRAY_TASK_ID}" >> ${SLURM_JOB_NAME}_failed_taskids.${SLURM_ARRAY_JOB_ID}
+else
+    echo "$subject" >> ${SLURM_JOB_NAME}_success_subjects.${SLURM_ARRAY_JOB_ID}
+fi
+
+echo Finished tasks ${SLURM_ARRAY_TASK_ID} with exit code $exitcode
+exit $exitcode
+```
+]
+
+* SLURM captures standard and error outputs to two files (per task):
+  ```Text
+  $HOME/slurm/ds000003/log/fmriprep-<job-id>-<task-id>.{out,err}
+  ```
+
+* The script generates three files, containing a list of successfully processed subject labels,
+  a list of failed subjects, and a list of failed task IDs, correspondingly:
+  ```Text
+  $HOME/slurm/ds000003/fmriprep_success_subjects.<job-id>
+  $HOME/slurm/ds000003/fmriprep_failed_subjects.<job-id>
+  $HOME/slurm/ds000003/fmriprep_failed_taskids.<job-id>
+  ```
+
+---
+
+.small[
+```Bash
+#!/bin/bash
+#
+#SBATCH -J fmriprep
+#SBATCH --array=1-13%4
+#SBATCH --time=48:00:00
+#SBATCH -n 1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem-per-cpu=4G
+#SBATCH -p russpold,owners,normal
+
+# Outputs ----------------------------------
+#SBATCH -o log/%x-%A-%a.out
+#SBATCH -e log/%x-%A-%a.err
+#SBATCH --mail-user=%u@stanford.edu
+#SBATCH --mail-type=ALL
+# ------------------------------------------
+
+BIDS_DIR="$OAK/data/ds000003"
+OUTPUT_DIR="${BIDS_DIR}/derivatives/fmriprep-1.4.0"
+
+export SINGULARITYENV_TEMPLATEFLOW_HOME="$OAK/data/templateflow"
+SINGULARITY_CMD="singularity run -B $OAK:$OAK -B $L_SCRATCH:/work $GROUP_HOME/singularity_images/ \
+                 --cleanenv poldracklab_fmriprep_1.4.0-2019-05-15-2870a0e4efbf.simg"
+
+unset PYTHONPATH
+export FS_LICENSE=$HOME/.freesurfer.txt
+
+subject=$( tail -n +2 $BIDS_DIR/participants.tsv | cut -f 1  | sed "${SLURM_ARRAY_TASK_ID}q;d" | sed "s/sub-//g" | \
+           sed 's!.*/!!' )
+cmd="${SINGULARITY_CMD} ${BIDS_DIR} ${OUTPUT_DIR} participant --participant-label $subject -w /work/ -vv \
+    --omp-nthreads 8 --nthreads 12 --mem_mb 30000 --use-syn-sdc --cifti-output --use-aroma \
+    --output-spaces MNI152NLin2009cAsym:res-2 anat fsnative fsaverage5"
+echo Running task ${SLURM_ARRAY_TASK_ID}
+echo Commandline: $cmd
+eval $cmd
+exitcode=$?
+
+if [ "$exitcode" -ne "0" ]; then
+    echo "$subject" >> ${SLURM_JOB_NAME}_failed_subjects.${SLURM_ARRAY_JOB_ID}
+    echo "${SLURM_ARRAY_TASK_ID}" >> ${SLURM_JOB_NAME}_failed_taskids.${SLURM_ARRAY_JOB_ID}
+else
+    echo "$subject" >> ${SLURM_JOB_NAME}_success_subjects.${SLURM_ARRAY_JOB_ID}
+fi
+
+echo Finished tasks ${SLURM_ARRAY_TASK_ID} with exit code $exitcode
+exit $exitcode
+```
+]
+
+---
+
+### Tips and tricks: pre-run FreeSurfer
+
+Either if you have already run FreeSurfer (+6.0.0), or you are just running the dataset
+for first, you can feed FreeSurfer outputs into fMRIPrep.
+
+* Pre-run FreeSurfer - make sure the folder is available under the output folder:
+  .small[
+  ```Text
+├── derivatives
+│   ├── fmriprep-1.4.0
+│   │   └── freesurfer ───────┐
+  │   ├── freesurfer-6.0.1  <───┘
+  ```
+  ]
+  .small[
+  ```Bash
+$ mkdir -p derivatives/fmriprep-1.4.0
+  $ cd derivatives/fmriprep-1.4.0
+  $ ln -s ../freesurfer-6.0.1 freesurfer
+  ```
+  ]
+
+  * Delete previously existing `IsRunning` files:
+  .small[
+  ```Bash
+$ find ${BIDS_DIR}/derivatives/freesurfer-6.0.1 -name "*IsRunning*" -delete
+
+  ```
+  ]
+
+* If not pre-run, make a first pass with the flag `--anat-only`.
+  .small[
+  ```Bash
+$ mkdir -p derivatives/fmriprep-1.4.0
+  $ mkdir -p derivatives/freesurfer-6.0.1
+  $ cd derivatives/fmriprep-1.4.0
+  $ ln -s ../freesurfer-6.0.1 freesurfer
+  ```
+  ]
+
+  * Submit only to queues you own, if possible.
+
+---
+
+.small[
+```Bash
+#!/bin/bash
+#
+#SBATCH -J fmriprep-anat
+#SBATCH --array=1-13%4
+#SBATCH --time=48:00:00
+#SBATCH -n 1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem-per-cpu=4G
+#SBATCH -p russpold  # ONLY A QUEUE I BELONG
+
+# Outputs ----------------------------------
+#SBATCH -o log/%x-%A-%a.out
+#SBATCH -e log/%x-%A-%a.err
+#SBATCH --mail-user=%u@stanford.edu
+#SBATCH --mail-type=ALL
+# ------------------------------------------
+
+BIDS_DIR="$OAK/data/ds000003"
+OUTPUT_DIR="${BIDS_DIR}/derivatives/fmriprep-1.4.0"
+
+export SINGULARITYENV_TEMPLATEFLOW_HOME="$OAK/data/templateflow"
+SINGULARITY_CMD="singularity run -B $OAK:$OAK -B $L_SCRATCH:/work $GROUP_HOME/singularity_images/ \
+                 --cleanenv poldracklab_fmriprep_1.4.0-2019-05-15-2870a0e4efbf.simg"
+
+unset PYTHONPATH
+export FS_LICENSE=$HOME/.freesurfer.txt
+
+subject=$( tail -n +2 $BIDS_DIR/participants.tsv | cut -f 1  | sed "${SLURM_ARRAY_TASK_ID}q;d" | sed "s/sub-//g" | \
+           sed 's!.*/!!' )
+cmd="${SINGULARITY_CMD} ${BIDS_DIR} ${OUTPUT_DIR} participant --participant-label $subject -w /work/ -vv \
+    --omp-nthreads 8 --nthreads 12 --mem_mb 30000 --anat-only \
+    --output-spaces MNI152NLin2009cAsym:res-2 fsnative fsaverage5"
+echo Running task ${SLURM_ARRAY_TASK_ID}
+echo Commandline: $cmd
+eval $cmd
+exitcode=$?
+
+if [ "$exitcode" -ne "0" ]; then
+    echo "$subject" >> ${SLURM_JOB_NAME}_failed_subjects.${SLURM_ARRAY_JOB_ID}
+    echo "${SLURM_ARRAY_TASK_ID}" >> ${SLURM_JOB_NAME}_failed_taskids.${SLURM_ARRAY_JOB_ID}
+else
+    echo "$subject" >> ${SLURM_JOB_NAME}_success_subjects.${SLURM_ARRAY_JOB_ID}
+fi
+
+echo Finished tasks ${SLURM_ARRAY_TASK_ID} with exit code $exitcode
+exit $exitcode
+```
+]
 
 ---
 
@@ -585,10 +954,7 @@ In addition, we've had numerous bug fixes and documentation updates from users.
 We believe that code and documentation are academic and scientific
 contributions that deserve citation.
 
-![Zenodo](assets/zenodo.png)
-
-Zenodo is an online repository that archives and assigns DOIs to software.
-We encourage all contributors to add themselves to our author list.
+<img src="assets/nmeth.png" style="width: 100%" />
 
 ]
 
@@ -642,3 +1008,4 @@ reporting bugs to contributing code.
 
 * [sub-01](assets/sub-01.html)
 * [sub-rid000001](assets/sub-rid000001.html)
+ci
