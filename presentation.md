@@ -1,7 +1,7 @@
 class: center middle
 
 # fMRIPrep - A Robust Preprocessing Pipeline for Functional MRI
-### CJ. Markiewicz, R. Ciric, O. Esteban
+### O. Esteban, R. Ciric, CJ. Markiewicz, RA. Poldrack, and KJ. Gorgolewski
 #### Center for Reproducible Neuroscience
 #### Stanford University
 
