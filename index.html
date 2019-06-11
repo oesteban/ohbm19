@@ -28,7 +28,8 @@
         font-weight: 400;
         margin-bottom: 0;
       }
-      .remark-slide-content { height: 30em; }
+
+      .remark-slide-content { height: 100%; padding: 1em 1em 0 0;}
       .remark-slide-content h1 { font-size: 3em; }
       .remark-slide-content h2 { font-size: 2em; }
       .remark-slide-content h3 { font-size: 1.6em; }
@@ -37,6 +38,9 @@
         bottom: 3em;
         font-size: 0.7em;
       }
+      ul {padding-left: 6em;}
+      .remark-slide-content ul { font-size: 10em; }
+      li {margin-left: 2em;}
       li p { line-height: 1.25em; }
       .red { color: #fa0000; }
       .blue { color: #0000fa; }
@@ -79,6 +83,30 @@
         color: #f3f3f3;
         line-height: 0.8em;
       }
+
+      .perma-sidebar {
+        background-color: #F8B238;
+        color: #777;
+        width: 20%;
+        height: 120%;
+        float: left;
+        padding: 0;
+        margin: -1em 2em 0 0;
+        text-align: center;
+      }
+      .perma-sidebar h2:last-of-type, .perma-sidebar h3:last-child {
+        color: #000;
+      }
+
+      .sidebar-slug {
+          bottom: 12px;
+          left: 0;
+          opacity: .5;
+          position: absolute;
+          width: 20%;
+      }
+
+      .svg-reportlet { width: 75%; }
 
       /* Slide-specific styling */
       #slide-inverse .footnote {
@@ -211,7 +239,8 @@
           highlightLines: true,
           countIncrementalSlides: false,
           highlightSpans: true,
-          sourceUrl: 'presentation.md'
+          sourceUrl: 'presentation.md',
+          ratio: '16:9'
       });
     </script>
   </body>
