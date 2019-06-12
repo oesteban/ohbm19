@@ -325,7 +325,7 @@ presented since fMRIPrep 1.4.0.
 
 ---
 
-# Outputs are BIDS-Derivatives
+## Outputs are BIDS-Derivatives
 
 fMRIPrep outputs adhere to the
 [BIDS Derivatives draft
@@ -369,7 +369,7 @@ In each output space (e.g., T1w, normalized spaces, surface\*):
 
 ---
 
-# MRIQC vs. fMRIPrep
+## MRIQC vs. fMRIPrep
 
 .pull-left[
 
