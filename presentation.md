@@ -298,33 +298,6 @@ presented since fMRIPrep 1.4.0.
 
 ---
 
-## Surface outputs: "Grayordinates"
-
-.left-column[
-<p align="center">
-<img src="assets/nihms479144f1.png" width="90%" />
-</p>
-]
-
-.right-column[
-
-* CIFTI2 files (`_bold.dtseries.nii`) are built by sampling BOLD
-  signal at 92k locations across the gray matter.
-
-* Combine surface and volumetric information.
-
-* Enabled with the `--cifti-outputs` option
-
-* However, fMRIPrep **only partially** supports the original grayordinates
-  from the HCP project.
-
-* Figure from ([Glasser et al., 2013](https://doi.org/10.1016/j.neuroimage.2013.04.127))
-
-]
-
-
----
-
 ## Outputs are BIDS-Derivatives
 
 fMRIPrep outputs adhere to the
@@ -369,7 +342,44 @@ In each output space (e.g., T1w, normalized spaces, surface\*):
 
 ---
 
+## Surface outputs: "Grayordinates"
+
+.left-column[
+<p align="center">
+<img src="assets/nihms479144f1.png" width="90%" />
+</p>
+]
+
+.right-column[
+
+* CIFTI2 files (`_bold.dtseries.nii`) are built by sampling BOLD
+  signal at 91k locations across the gray matter.
+
+* Combine surface and volumetric information.
+
+* Enabled with the `--cifti-outputs` option
+
+* However, fMRIPrep **only partially** supports the original grayordinates
+  from the HCP project.
+
+* Figure from ([Glasser et al., 2013](https://doi.org/10.1016/j.neuroimage.2013.04.127))
+
+]
+
+
+---
+
 ## MRIQC vs. fMRIPrep
+
+Users have repeatedly suggested that fMRIPrep should generate
+image quality metrics (IQMs), like MRIQC.
+
+--
+
+However, fMRIPrep .red[is not] the better replacement for
+MRIQC.
+
+--
 
 .pull-left[
 
@@ -450,18 +460,20 @@ $ mkdir -p derivatives/fmriprep-1.4.0
   ]
 ---
 ## fMRIPrep is stable, not finished!
---
 
 * fMRI preprocessing is a moving target, and best practices are going to change.
 
---
-
 * You may already have improvements you want to make.
-
---
 
 * fMRIPrep is a community-supported effort, and your contributions are encouraged!
 
+--
+
+##
+## Opening up decision making to the community
+
+* We plan to regularly schedule webinars to rejoin the
+community and define the development roadmap. .blue[Get involved!]
 
 ---
 
@@ -530,14 +542,11 @@ accessible and searchable.
 ## Summary
 
 fMRIPrep is a **robust**, **generic** fMRI preprocessing pipeline that produces
-outputs that are ready to be used in various analysis pipelines\*.
-
---
+outputs that are ready to be used in various analysis pipelines.
 
 Generated reports enable researchers to quickly identify issues in their data
 as well as any errors in preprocessing.
 
---
 
 fMRIPrep is a **community effort**. We welcome *any* level of engagement, from
 reporting bugs to contributing code.
