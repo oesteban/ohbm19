@@ -34,14 +34,18 @@ template: sidebar
 ---
 
 ## Robust, generic fMRI preprocessing
-* Works with the data you give it, imposing minimal requirements
-  * You can run it on a T1w scan and a BOLD series
-
-## Standardized
-
-* By adhering to modern data format standards, fMRIPrep can detect
-  the available images and prepare outputs that can be used by all
+* Adapts the workflow to the actual data available
+  * fMRIPrep can detect the available images and prepare outputs that can be used by all
   major software packages (FSL, SPM\*, etc.)
+
+* Imposing minimal requirements:
+  * At least one T1w and one BOLD run
+  * Data must be [BIDS-Compliant](https://bids-standard.github.io/bids-validator/)
+
+## Adhered to modern standards and community-driven
+
+* fMRIPrep is a [BIDS-App](https://bids-apps.github.io)
+
 
 ## Self-documenting
 
@@ -53,7 +57,7 @@ template: sidebar
 
 ---
 
-# Reports as Scaffolds for Expertise
+## Reports as Scaffolds for Expertise
 
 .pull-left[
 <p align="center">
@@ -62,7 +66,15 @@ template: sidebar
 ]
 
 .pull-right[
-Check out poster W633 by J. Wright!
+
+.distribute[
+fMRIPrep generates one participant-wide report
+after execution, providing .blue[visual support to look inside the box].
+
+.large[Reports are a crucial element to ensure transparency.]
+
+.blue[Check out poster W633 by J. Wright!]
+]
 ]
 
 
@@ -74,13 +86,16 @@ Check out poster W633 by J. Wright!
 Reports describe the data as found, and the steps applied:
 
   1. Show researchers their data
+
   2. Describe the preprocessing performed
+
   3. Show the results of preprocessing, facilitating early error detection
+
 ]
 
 .pull-right[
 <p align="center">
-<img alt="Execution and anatomical summary" src="assets/anat_summary.png">
+<img alt="Execution and anatomical summary" src="assets/anat_summary.png" />
 </p>
 Textual summaries are good to check for obvious failures, such as missing images or implausible
 values.
@@ -89,27 +104,26 @@ values.
 
 ---
 
+## fMRIPrep Reports: functional summary
+
+.pull-right[
 <p align="center">
 <img alt="Functional summary" src="assets/func_summary.png">
 </p>
+]
 
+.pull-left[
 The functional summary can vary based on:
 
 1. Available data
  \- SDC technique depends on the available field maps
 
---
-
 2. Metadata - slice-timing correction requires `SliceTiming` metadata entry
-
---
 
 3. User selections - `bbregister` requires FreeSurfer, `FLIRT` used otherwise
 
---
-
 4. Heuristics - BBR may fall back to volume-based coregistration
-
+]
 
 ---
 ## General structure of the workflow
@@ -153,6 +167,21 @@ Poster W571
 
 ---
 
+## Spatial normalization to pediatric template (as of v. 1.4.1rc4)
+
+<div style='margin-top: 1em'>
+<object class="svg-reportlet" type="image/svg+xml"
+ data="assets/sub-NDARINV3BL9Z315_space-MNIPediatricAsym_T1w.svg">filename:assets/sub-001_T1w_t1_2_mni.svg</object>
+</div>
+
+
+Starting with version 1.4.1rc4 (which will become 1.4.1), fMRIPrep allows spatial normalization to one
+or more standardized spatial references - including infant and pediatric templates.
+
+Target templates can be specified with the `--output-spaces` command line argument.
+
+---
+
 ## Anatomical processing: surface reconstruction
 
 <p>
@@ -188,6 +217,14 @@ reference.
 
 ## Functional processing: SDC in detail
 
+
+.left-column3[
+<p align="center">
+<img src="assets/fmriprep-workflow-sdc.svg" width="100%" />
+</p>
+]
+
+.right-column3[
 * Hierarchy of SDC methods:
   1. PE-Polar
   2. Fieldmap
@@ -201,14 +238,7 @@ reference.
 
 
 * REQUIRES (opts. 1 or 2): setting the [`IntendedFor`](https://bids-specification.readthedocs.io/en/latest/04-modality-specific-files/01-magnetic-resonance-imaging-data.html#fieldmap-data) metadata field of fieldmaps.
-
----
-count: false
-
-## Functional processing: SDC in detail
-<p align="center">
-<img src="assets/fmriprep-workflow-sdc.svg" width="40%" />
-</p>
+]
 
 ---
 ## Functional processing: anatomical alignment
@@ -270,13 +300,13 @@ presented since fMRIPrep 1.4.0.
 
 ## Surface outputs: "Grayordinates"
 
-.left-column2[
+.left-column[
 <p align="center">
 <img src="assets/nihms479144f1.png" width="90%" />
 </p>
 ]
 
-.right-column2[
+.right-column[
 
 * CIFTI2 files (`_bold.dtseries.nii`) are built by sampling BOLD
   signal at 92k locations across the gray matter.
@@ -295,7 +325,7 @@ presented since fMRIPrep 1.4.0.
 
 ---
 
-### Derivatives
+# Outputs are BIDS-Derivatives
 
 fMRIPrep outputs adhere to the
 [BIDS Derivatives draft
@@ -481,7 +511,9 @@ In addition, we've had numerous bug fixes and documentation updates from users.
 We believe that code and documentation are academic and scientific
 contributions that deserve citation.
 
-<img src="assets/nmeth.png" style="width: 100%" />
+<p align="center">
+<img src="assets/nmeth.png" width="65%" />
+</p>
 
 ---
 

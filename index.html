@@ -62,6 +62,7 @@
       .pull-right {
         float: right;
         width: 39%;
+        height: 75%;
       }
       .pull-right ~ p {
         clear: both;
@@ -147,22 +148,21 @@
 
       /* Two-column layout */
       .left-column {
-        color: #777;
-        width: 20%;
-        height: 92%;
+        width: 23%;
+        height: 82%;
         float: left;
       }
         .left-column h2:last-of-type, .left-column h3:last-child {
           color: #000;
         }
       .right-column {
-        width: 75%;
+        width: 55%;
         float: right;
         padding-top: 1em;
       }
       /* Two-column layout (40% left) */
       .left-column2 {
-        width: 25%;
+        width: 35%;
         height: 85%;
         float: left;
       }
@@ -170,15 +170,14 @@
           color: #000;
         }
       .right-column2 {
-        width: 53%;
+        width: 43%;
         float: right;
         padding-top: 1em;
       }
       /* Two-column layout (60% left) */
       .left-column3 {
-        color: #777;
-        width: 60%;
-        height: 92%;
+        width: 43%;
+        height: 85%;
         float: left;
       }
         .left-column h2:last-of-type, .left-column h3:last-child {
@@ -225,6 +224,14 @@
 
       .small code {
         font-size: 9pt;
+      }
+
+      .distribute {
+        display: flex;
+        height: 100%;
+        justify-content: space-between;
+        flex-direction: column;
+        width: 100%;
       }
     </style>
   </head>
