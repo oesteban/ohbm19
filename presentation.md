@@ -4,7 +4,9 @@ layout: true
 .perma-sidebar[
 ##Th587
 # fMRIPrep
-<div class="sidebar-slug">OHBM 2019</div>
+<img src="assets/qr.fmriprep.png" />
+
+<div class="sidebar-slug"><img src="assets/logo.jpg" alt="OHBM 2019" /></div>
 ]
 
 ---
@@ -17,6 +19,12 @@ class: center middle
 #### Stanford University
 
 ###### [oesteban.github.io/ohbm19](https://oesteban.github.io/ohbm19)
+
+---
+
+<p align="center">
+  <img src="assets/poster-fmriprep.png" width="70%" />
+</p>
 
 ---
 
@@ -45,7 +53,63 @@ template: sidebar
 
 ---
 
-W633  Visualizations as Scaffolds for Expertise: Learning from fMRIPrep's Visual Reports
+# Reports as Scaffolds for Expertise
+
+.pull-left[
+<p align="center">
+<img src="assets/jessey.png" width="400px" />
+</p>
+]
+
+.pull-right[
+Check out poster W633 by J. Wright!
+]
+
+
+---
+
+## fMRIPrep Reports
+
+.pull-left[
+Reports describe the data as found, and the steps applied:
+
+  1. Show researchers their data
+  2. Describe the preprocessing performed
+  3. Show the results of preprocessing, facilitating early error detection
+]
+
+.pull-right[
+<p align="center">
+<img alt="Execution and anatomical summary" src="assets/anat_summary.png">
+</p>
+Textual summaries are good to check for obvious failures, such as missing images or implausible
+values.
+]
+
+
+---
+
+<p align="center">
+<img alt="Functional summary" src="assets/func_summary.png">
+</p>
+
+The functional summary can vary based on:
+
+1. Available data
+ \- SDC technique depends on the available field maps
+
+--
+
+2. Metadata - slice-timing correction requires `SliceTiming` metadata entry
+
+--
+
+3. User selections - `bbregister` requires FreeSurfer, `FLIRT` used otherwise
+
+--
+
+4. Heuristics - BBR may fall back to volume-based coregistration
+
 
 ---
 ## General structure of the workflow
@@ -81,7 +145,11 @@ Skull stripping defects may be more obvious here.
 
 ---
 
-W571  TemplateFlow: a 4D standard space of neuroimaging standard spaces
+
+<p align="center">
+  <img src="assets/poster-templateflow.png" width="70%" />
+</p>
+Poster W571
 
 ---
 
@@ -203,23 +271,27 @@ presented since fMRIPrep 1.4.0.
 ## Surface outputs: "Grayordinates"
 
 .left-column2[
+<p align="center">
+<img src="assets/nihms479144f1.png" width="90%" />
+</p>
+]
+
+.right-column2[
 
 * CIFTI2 files (`_bold.dtseries.nii`) are built by sampling BOLD
-  signal at &aprox;92k locations across the gray matter.
+  signal at 92k locations across the gray matter.
+
 * Combine surface and volumetric information.
+
 * Enabled with the `--cifti-outputs` option
+
 * However, fMRIPrep **only partially** supports the original grayordinates
   from the HCP project.
+
 * Figure from ([Glasser et al., 2013](https://doi.org/10.1016/j.neuroimage.2013.04.127))
 
 ]
 
-.right-column2[
-<p align="center">
-<img src="assets/nihms479144f1.png" width="20%" />
-</p>
-
-]
 
 ---
 
@@ -239,7 +311,7 @@ specification](https://bids-specification.readthedocs.io/en/derivatives/05-deriv
 * Anatomical brain mask
 * Tissue probability/class maps
   * Classes: GM, WM, CSF
-* T1w ⇄ MNI transforms
+* T1w ⇄ Normalized space transforms
 * Reconstructed surfaces\*
   * `smoothwm`, `pial`, `midthickness`, `inflated`
 * Parcellation and segmentation (`aparcaseg`)\*
@@ -252,7 +324,7 @@ specification](https://bids-specification.readthedocs.io/en/derivatives/05-deriv
 
 #### Functional
 
-In each output space (e.g., T1w, MNI, surface\*):
+In each output space (e.g., T1w, normalized spaces, surface\*):
 
 * Distortion corrected BOLD series
 * BOLD mask
@@ -274,12 +346,17 @@ In each output space (e.g., T1w, MNI, surface\*):
 ### MRIQC
 
 * Purpose: assessment of *raw* MRI data
+
 * Processing: quick & dirty
+
 * Derivatives: image quality metrics only
+
 * Reports: to assess the data
+
 * Other outcomes: data exclusion list
 
-#### Use first with pre-specified exclusion criteria
+.blue[Use first with pre-specified exclusion criteria]
+
 ]
 
 --
@@ -288,61 +365,17 @@ In each output space (e.g., T1w, MNI, surface\*):
 ### fMRIPrep
 
 * Purpose: ready data for analysis
+
 * Processing: careful & sophisticated
+
 * Derivatives: BOLD data to feed models and contound regressors
+
 * Reports: to assess the processing
+
 * Other outcomes: boilerplate, etc.
 
-#### Use after MRIQC, only on those subjects who passed QC
+.blue[Use after MRIQC, only on those subjects who passed QC]
 ]
-
-
----
-
-## fMRIPrep Reports
-
-Reports describe the data as found, and the steps applied.
-
-<p align="center">
-<img alt="Execution and anatomical summary" src="assets/anat_summary.png">
-</p>
-
-Textual summaries are good to check for obvious failures, such as missing images or implausible
-values.
-
----
-
-<p align="center">
-<img alt="Functional summary" src="assets/func_summary.png">
-</p>
-
-The functional summary can vary based on:
-
-1. Available data
- \- SDC technique depends on the available field maps
-
---
-
-2. Metadata - slice-timing correction requires `SliceTiming` metadata entry
-
---
-
-3. User selections - `bbregister` requires FreeSurfer, `FLIRT` used otherwise
-
---
-
-4. Heuristics - BBR may fall back to volume-based coregistration
-
----
-
-<div style="height: 3em"></div>
-
-#### Summary
-
-1. Show researchers their data
-2. Describe the preprocessing performed
-3. Show the results of preprocessing, facilitating early error detection
-
 
 ---
 
