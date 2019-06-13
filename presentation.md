@@ -419,7 +419,27 @@ MRIQC.
 
 ---
 
-### Tips and tricks: pre-run FreeSurfer
+## Proposed protocol
+
+<p align="center">
+  <img src="assets/prep-workflow.png" width="60%" />
+</p>
+(Figure from K. Finc)
+---
+
+## Installing
+
+<div style="width: 75%; height: 80%; margin: 10px 0 0 250px; display: block;">
+<asciinema-player src="assets/251439.cast" autoplay="true" speed="4"></asciinema-player>
+</div>
+
+<!--
+<script id="asciicast-251439" src="https://asciinema.org/a/251439.js" data-autoplay="true" data-speed="4" async></script>
+-->
+
+--
+
+## Tips and tricks: pre-run FreeSurfer
 
 Either if you have already run FreeSurfer (+6.0.0), or you are just running the dataset
 for first, you can feed FreeSurfer outputs into fMRIPrep.
@@ -559,10 +579,4 @@ reporting bugs to contributing code.
   * [DS000001](https://openneuro.org/datasets/ds000001/versions/00006?app=FMRIPREP&version=58&job=5af461051841f62a9a80d70d)
   * [DS000233](https://openneuro.org/datasets/ds000233/versions/00004?app=FMRIPREP&version=57&job=5aea16e089704e1298dbd618)
 
----
-
-## "Live" links
-
-* [sub-01](assets/sub-01.html)
-* [sub-rid000001](assets/sub-rid000001.html)
-ci
+* DataLad's [///labs/poldrack/ds003_fmriprep](http://datasets.datalad.org/?dir=/labs/poldrack/ds003_fmriprep)
