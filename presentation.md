@@ -433,11 +433,21 @@ MRIQC.
 <asciinema-player src="assets/251439.cast" autoplay="true" speed="4"></asciinema-player>
 </div>
 
-<!--
-<script id="asciicast-251439" src="https://asciinema.org/a/251439.js" data-autoplay="true" data-speed="4" async></script>
--->
+---
 
---
+## Running
+
+fMRIPrep follows the BIDS-Apps specification for its command line:
+
+```Bash
+$ fmriprep-docker /path/to/data/dir /path/to/output/dir participant
+RUNNING: docker run --rm -it -v /path/to/data/dir:/data:ro \
+    -v /path/to_output/dir:/out poldracklab/fmriprep:1.0.0 \
+    /data /out participant
+...
+```
+
+---
 
 ## Tips and tricks: pre-run FreeSurfer
 
