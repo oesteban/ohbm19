@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>fMRIPrep - A Robust Preprocessing Pipeline for Functional MRI</title>
+    <title>TORW2020 - NiPreps</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" type="text/css" href="assets/asciinema-player.css" />
     <style>
@@ -28,6 +28,15 @@
         font-family: 'Yanone Kaffeesatz';
         font-weight: 400;
         margin-bottom: 0;
+      }
+
+      .middle {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        width:100%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
       }
 
       .remark-slide-content { height: 100%; padding: 1em 1em 0 0;}
@@ -75,19 +84,14 @@
         font-size: 0.9em;
         padding: 15px;
       }
-      .inverse {
-        background: #272822;
-        color: #777872;
-        text-shadow: 0 0 20px #333;
-      }
-      .inverse h1, .inverse h2 {
-        color: #f3f3f3;
-        line-height: 0.8em;
+      .section-separator .middle {
+        margin-left: 210px;
+        width: 80%;
       }
 
       .perma-sidebar {
-        background-color: #F8B238;
-        color: #000;
+        background-color: #8c1515;
+        color: #f4f4f4;
         width: 210px;
         height: 120%;
         float: left;
@@ -96,7 +100,7 @@
         text-align: center;
       }
       .perma-sidebar h2:last-of-type, .perma-sidebar h3:last-child {
-        color: #fff;
+        color: #d2c295;
       }
 
       .sidebar-slug {
@@ -227,12 +231,20 @@
         font-size: 9pt;
       }
 
+      .large {
+        font-size: 24pt;
+      }
+
       .distribute {
         display: flex;
         height: 100%;
         justify-content: space-between;
         flex-direction: column;
         width: 100%;
+      }
+
+      .cut-right {
+        margin-right: 100px;
       }
     </style>
   </head>
